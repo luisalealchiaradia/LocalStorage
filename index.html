@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho de Compras</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background-color: #f3f6f3;
+            color: #20322e;
+            font-family: Arial, sans-serif;
+        }
+
+        main {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+
+        header {
+            margin-bottom: 36px;
+        }
+
+        h1 {
+            margin-bottom: 12px;
+            font-size: 36px;
+        }
+
+        header p {
+            color: #596b65;
+            line-height: 1.6;
+        }
+
+        .colunas {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .cartao {
+            padding: 28px;
+            background-color: white;
+            border: 1px solid #dce5df;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(32, 50, 46, 0.04);
+        }
+
+        h2 {
+            margin: 0 0 24px;
+            font-size: 21px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            margin-bottom: 22px;
+            padding: 14px;
+            border: 1px solid #bccbc3;
+            border-radius: 8px;
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+            font: inherit;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            background-color: #225d46;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #164631;
+        }
+
+        input:focus-visible,
+        button:focus-visible {
+            outline: 3px solid #ba8530;
+            outline-offset: 3px;
+        }
+
+        .observacao {
+            margin-top: 20px;
+            color: #596b65;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        #mensagem {
+            margin-bottom: 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .cabecalho {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+        }
+
+        #quantidade {
+            color: #496456;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        #vazio {
+            color: #596b65;
+        }
+
+        #listaProdutos {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        #listaProdutos li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 18px 0;
+            border-bottom: 1px solid #e8eee9;
+        }
+
+        .nomeProduto {
+            flex: 1;
+            overflow-wrap: anywhere;
+        }
+
+        .valorProduto {
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .remover {
+            padding: 6px 8px;
+            background-color: white;
+            color: #8b302d;
+            border: 1px solid #e3c8c6;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .remover:hover {
+            background-color: #fff1f0;
+        }
+
+        .total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-top: 28px;
+            padding-top: 22px;
+            border-top: 2px solid #dce5df;
+        }
+
+        .total strong {
+            color: #225d46;
+            font-size: 26px;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 720px) {
+            main {
+                padding: 30px 16px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .colunas {
+                grid-template-columns: 1fr;
+            }
+
+            .cartao {
+                padding: 22px;
+            }
+
+            #listaProdutos li {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <header>
+            <h1>Carrinho de Compras</h1>
+            <p>Cadastre seus produtos e acompanhe o total da compra.</p>
+        </header>
+
+        <div class="colunas">
+            <section class="cartao">
+                <h2>Adicionar produto</h2>
+
+                <form id="formProduto">
+                    <label for="nome">Nome do produto</label>
+                    <input
+                        type="text"
+                        id="nome"
+                        maxlength="120"
+                        placeholder="Ex.: Aparelhos Eletrônicos"
+                        required
+                    >
+
+                    <label for="preco">Valor do produto (R$)</label>
+                    <input
+                        type="number"
+                        id="preco"
+                        min="0.01"
+                        step="0.01"
+                        placeholder="Ex.: 150,00"
+                        required
+                    >
+
+                    <button type="submit">
+                        Adicionar ao carrinho
+                    </button>
+                </form>
+
+                <p class="observacao">
+                    Os produtos ficam salvos neste navegador.
+                </p>
+
+                <p id="mensagem" role="status" aria-live="polite"></p>
+            </section>
+
+            <section class="cartao">
+                <div class="cabecalho">
+                    <h2>Produtos adicionados</h2>
+                    <span id="quantidade">0 produtos</span>
+                </div>
+
+                <p id="vazio">Seu carrinho está vazio.</p>
+
+                <ul id="listaProdutos"></ul>
+
+                <div class="total">
+                    <span>Total da compra</span>
+                    <strong id="total" aria-live="polite">
+                        R$ 0,00
+                    </strong>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        "use strict";
+
+        const CHAVE = "produtos";
+
+        const formulario = document.getElementById("formProduto");
+        const campoNome = document.getElementById("nome");
+        const campoPreco = document.getElementById("preco");
+        const mensagem = document.getElementById("mensagem");
+
+        const moeda = new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        });
+
+        let produtos = recuperarProdutos();
+
+        function produtoValido(produto) {
+            return (
+                produto !== null &&
+                typeof produto === "object" &&
+                typeof produto.nome === "string" &&
+                produto.nome.trim().length > 0 &&
+                typeof produto.preco === "number" &&
+                Number.isFinite(produto.preco) &&
+                produto.preco > 0 &&
+                Number.isSafeInteger(Math.round(produto.preco * 100))
+            );
+        }
+
+        function recuperarProdutos() {
+            try {
+                const texto = localStorage.getItem(CHAVE);
+
+                if (texto === null) {
+                    return [];
+                }
+
+                const dados = JSON.parse(texto);
+
+                if (!Array.isArray(dados) || !dados.every(produtoValido)) {
+                    throw new Error("Dados inválidos");
+                }
+
+                return dados;
+            } catch (erro) {
+                mensagem.textContent =
+                    "Não foi possível recuperar o carrinho salvo. " +
+                    "Você pode iniciar um novo cadastro.";
+
+                return [];
+            }
+        }
+
+        function salvarProdutos() {
+            try {
+                localStorage.setItem(
+                    CHAVE,
+                    JSON.stringify(produtos)
+                );
+
+                return true;
+            } catch (erro) {
+                mensagem.textContent =
+                    "Carrinho atualizado nesta página, mas não foi possível " +
+                    "salvá-lo no navegador. Os dados podem ser perdidos ao atualizar.";
+
+                return false;
+            }
+        }
+
+        function totalEmCentavos() {
+            return produtos.reduce(function (total, produto) {
+                return total + Math.round(produto.preco * 100);
+            }, 0);
+        }
+
+        function cadastrarProduto(evento) {
+            evento.preventDefault();
+
+            const produto = {
+                nome: campoNome.value.trim(),
+                preco: Number(campoPreco.value)
+            };
+
+            if (!produtoValido(produto)) {
+                mensagem.textContent =
+                    "Informe um nome e um valor válido maior que zero.";
+
+                return;
+            }
+
+            const centavos = Math.round(produto.preco * 100);
+
+            if (
+                centavos < 1 ||
+                !Number.isSafeInteger(totalEmCentavos() + centavos)
+            ) {
+                mensagem.textContent =
+                    "Informe um valor de pelo menos R$ 0,01 " +
+                    "e dentro do limite de cálculo.";
+
+                return;
+            }
+
+            produto.preco = centavos / 100;
+            produtos.push(produto);
+
+            if (salvarProdutos()) {
+                mensagem.textContent =
+                    "Produto adicionado e carrinho salvo!";
+            }
+
+            mostrarProdutos();
+            formulario.reset();
+            campoNome.focus();
+        }
+
+        function removerProduto(indice) {
+            produtos.splice(indice, 1);
+
+            if (salvarProdutos()) {
+                mensagem.textContent =
+                    "Produto removido e carrinho salvo.";
+            }
+
+            mostrarProdutos();
+        }
+
+        function mostrarProdutos() {
+            const lista = document.getElementById("listaProdutos");
+
+            lista.replaceChildren();
+
+            produtos.forEach(function (produto, indice) {
+                const item = document.createElement("li");
+
+                const nome = document.createElement("span");
+                nome.className = "nomeProduto";
+                nome.textContent = produto.nome;
+
+                const valor = document.createElement("span");
+                valor.className = "valorProduto";
+                valor.textContent = moeda.format(produto.preco);
+
+                const remover = document.createElement("button");
+                remover.type = "button";
+                remover.className = "remover";
+                remover.textContent = "Remover";
+
+                remover.setAttribute(
+                    "aria-label",
+                    "Remover " + produto.nome
+                );
+
+                remover.addEventListener("click", function () {
+                    removerProduto(indice);
+                });
+
+                item.append(nome, valor, remover);
+                lista.appendChild(item);
+            });
+
+            document.getElementById("vazio").hidden =
+                produtos.length > 0;
+
+            document.getElementById("quantidade").textContent =
+                produtos.length +
+                (produtos.length === 1 ? " produto" : " produtos");
+
+            document.getElementById("total").textContent =
+                moeda.format(totalEmCentavos() / 100);
+        }
+
+        formulario.addEventListener("submit", cadastrarProduto);
+
+        mostrarProdutos();
+    </script>
+</body>
+</html>
